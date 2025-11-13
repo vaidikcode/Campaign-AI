@@ -404,7 +404,7 @@ def research_agent_node(state: CampaignState) -> dict:
         return {} 
 
 def content_agent_node(state: CampaignState) -> dict:
-    print("--- 3. ✍️ Calling Content Agent (REAL) ---")
+    print("--- 4. ✍️ Calling Content Agent (REAL) ---")
     try:
         inputs = {
             "goal": state.goal,
@@ -421,7 +421,7 @@ def content_agent_node(state: CampaignState) -> dict:
         return {}
 
 def design_agent_node(state: CampaignState) -> dict:
-    print("--- 4. 🎨 Calling Design Agent (REAL) ---")
+    print("--- 5. 🎨 Calling Design Agent (REAL) ---")
     
     mock_brand_kit = BrandKit(
         logo_prompt=f"A minimalist, tech-inspired logo for {state.topic}",
@@ -447,7 +447,7 @@ def design_agent_node(state: CampaignState) -> dict:
     }
 
 def web_agent_node(state: CampaignState) -> dict:
-    print("--- 5. 🕸️ Calling Web Agent (REAL) ---")
+    print("--- 6. 🕸️ Calling Web Agent (REAL) ---")
     
     try:
         inputs = {
@@ -472,7 +472,7 @@ def web_agent_node(state: CampaignState) -> dict:
 
 # --- NEW AGENT NODE (BRD) ---
 def brd_agent_node(state: CampaignState) -> dict:
-    print("--- 6. 📄 Calling BRD Agent (REAL) ---")
+    print("--- 7. 📄 Calling BRD Agent (REAL) ---")
     try:
         inputs = {
             "topic": state.topic,
@@ -500,7 +500,7 @@ def brd_agent_node(state: CampaignState) -> dict:
 
 # --- MODIFIED STRATEGY AGENT ---
 def strategy_agent_node(state: CampaignState) -> dict:
-    print("--- 7. 📈 Calling Strategy Agent (REAL) ---")
+    print("--- 3. 📈 Calling Strategy Agent (REAL) ---")
     try:
         inputs = {
             "topic": state.topic,
@@ -542,12 +542,12 @@ graph_builder.add_node("ops_agent", ops_agent_node)
 # Add all edges (sequential flow)
 graph_builder.set_entry_point("planner_agent")
 graph_builder.add_edge("planner_agent", "research_agent")
-graph_builder.add_edge("research_agent", "content_agent")
+graph_builder.add_edge("research_agent", "strategy_agent")  # Strategy runs right after research
+graph_builder.add_edge("strategy_agent", "content_agent")
 graph_builder.add_edge("content_agent", "design_agent")
 graph_builder.add_edge("design_agent", "web_agent")
 graph_builder.add_edge("web_agent", "brd_agent") 
-graph_builder.add_edge("brd_agent", "strategy_agent") 
-graph_builder.add_edge("strategy_agent", "ops_agent") 
+graph_builder.add_edge("brd_agent", "ops_agent") 
 graph_builder.add_edge("ops_agent", END)
 
 
