@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 
 export default function Control() {
-  // KB Creation State
-  const [kbUrl, setKbUrl] = useState('')
-  const [kbLoading, setKbLoading] = useState(false)
-  const [kbMessage, setKbMessage] = useState('')
+  // Product Pitch State
+  const [productName, setProductName] = useState('')
+  const [productUrl, setProductUrl] = useState('')
+  const [systemPrompt, setSystemPrompt] = useState('')
+  const [pitchLoading, setPitchLoading] = useState(false)
+  const [pitchError, setPitchError] = useState('')
+  const [copied, setCopied] = useState(false)
 
   // Phone Call State
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -37,35 +40,47 @@ export default function Control() {
     }
   }, [])
 
-  // Handle KB Creation
-  const handleCreateKB = async () => {
-    if (!kbUrl) {
-      setKbMessage('❌ Please enter a URL')
+  // Handle Generate Pitch
+  const handleGeneratePitch = async () => {
+    if (!productName || !productUrl) {
+      setPitchError('⚠️ Please enter both product name and URL')
       return
     }
 
-    setKbLoading(true)
-    setKbMessage('⏳ Creating knowledge base...')
+    setPitchLoading(true)
+    setPitchError('')
+    setSystemPrompt('')
 
     try {
-      const response = await fetch('http://localhost:8002/create-knowledge-base', {
+      const response = await fetch('http://localhost:8003/generate-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: kbUrl })
+        body: JSON.stringify({
+          product_name: productName,
+          product_url: productUrl,
+        }),
       })
 
       if (response.ok) {
-        setKbMessage('✅ Knowledge base creation started! (This may take a few minutes)')
-        setKbUrl('')
+        const data = await response.json()
+        setSystemPrompt(data.system_prompt)
+        setPitchError('')
       } else {
         const error = await response.json()
-        setKbMessage(`❌ Failed: ${error.detail || 'Unknown error'}`)
+        setPitchError(`❌ Failed: ${error.detail || 'Unknown error'}`)
       }
     } catch (error) {
-      setKbMessage(`❌ Error: ${error.message}`)
+      setPitchError(`❌ Error: ${error.message}`)
     }
 
-    setKbLoading(false)
+    setPitchLoading(false)
+  }
+
+  // Handle Copy to Clipboard
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText(systemPrompt)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   // Handle Phone Call
@@ -192,63 +207,121 @@ export default function Control() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-5xl font-bold text-white mb-4 text-center">🎛️ Control Center</h1>
-        <p className="text-xl text-gray-300 mb-12 text-center">Manage Knowledge Base, Phone Calls, and Voice Assistant</p>
+        <h1 className="text-5xl font-bold text-white mb-4 text-center">🎛️ AI Voice Agent Control</h1>
+        <p className="text-xl text-gray-300 mb-12 text-center">Generate Custom Pitches & Test Your Voice Assistant</p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-          {/* Knowledge Base Section */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Step 1: Generate Pitch Section */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl lg:col-span-2">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">📚 Create Knowledge Base</h2>
-              <p className="text-gray-300 text-sm">Upload content from a URL to create a searchable knowledge base</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl">✨</span>
+                <h2 className="text-3xl font-bold text-white">Step 1: Generate Your Custom Pitch</h2>
+              </div>
+              <p className="text-gray-300 text-sm">Enter your product details to generate a custom AI assistant pitch</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4 mb-6">
+              <input
+                type="text"
+                placeholder="Product Name (e.g., Chroma)"
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                className="px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                disabled={pitchLoading}
+              />
               <input
                 type="url"
-                placeholder="Enter URL (e.g., https://example.com/docs)"
-                value={kbUrl}
-                onChange={(e) => setKbUrl(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={kbLoading}
+                placeholder="Product URL (e.g., https://www.trychroma.com)"
+                value={productUrl}
+                onChange={(e) => setProductUrl(e.target.value)}
+                className="px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                disabled={pitchLoading}
               />
-
-              <button
-                onClick={handleCreateKB}
-                className={`w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${kbLoading ? 'animate-pulse' : ''}`}
-                disabled={kbLoading}
-              >
-                {kbLoading ? (
-                  <>
-                    <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Processing...
-                  </>
-                ) : (
-                  '📥 Create Knowledge Base'
-                )}
-              </button>
-
-              {kbMessage && (
-                <div className={`p-4 rounded-lg ${kbMessage.includes('✅') ? 'bg-green-500/20 text-green-200 border border-green-500/50' : kbMessage.includes('⏳') ? 'bg-blue-500/20 text-blue-200 border border-blue-500/50' : 'bg-red-500/20 text-red-200 border border-red-500/50'}`}>
-                  {kbMessage}
-                </div>
-              )}
             </div>
+
+            <button
+              onClick={handleGeneratePitch}
+              className={`w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-6 ${pitchLoading ? 'animate-pulse' : ''}`}
+              disabled={pitchLoading}
+            >
+              {pitchLoading ? (
+                <>
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Generating Pitch...
+                </>
+              ) : (
+                '� Generate System Prompt'
+              )}
+            </button>
+
+            {pitchError && (
+              <div className="p-4 rounded-lg bg-red-500/20 text-red-200 border border-red-500/50 mb-6">
+                {pitchError}
+              </div>
+            )}
+
+            {systemPrompt && (
+              <div className="space-y-4">
+                <div className="bg-black/30 rounded-lg border border-white/10 overflow-hidden">
+                  <div className="flex justify-between items-center p-3 bg-white/5 border-b border-white/10">
+                    <h4 className="text-white font-semibold">📋 Generated System Prompt</h4>
+                    <button
+                      onClick={handleCopyPrompt}
+                      className="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded transition-colors text-sm flex items-center gap-2"
+                    >
+                      {copied ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                  </div>
+                  <div className="p-4 max-h-96 overflow-y-auto">
+                    <pre className="text-gray-200 text-sm whitespace-pre-wrap font-mono">{systemPrompt}</pre>
+                  </div>
+                </div>
+
+                {/* Setup Instructions */}
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-6">
+                  <h4 className="text-yellow-200 font-bold text-lg mb-4 flex items-center gap-2">
+                    <span>📖</span> Setup Instructions for Vapi Dashboard
+                  </h4>
+                  <ol className="space-y-3 text-yellow-100">
+                    <li className="flex gap-3">
+                      <span className="font-bold text-yellow-300">1.</span>
+                      <span>Go to your <a href="https://vapi.ai" target="_blank" rel="noopener noreferrer" className="underline hover:text-yellow-200">Vapi Dashboard</a></span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-bold text-yellow-300">2.</span>
+                      <span>Navigate to your Assistant settings</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-bold text-yellow-300">3.</span>
+                      <span>Paste the generated System Prompt above into the "Pitching Prompt" or "System Prompt" field</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-bold text-yellow-300">4.</span>
+                      <span>Save your assistant and test it using the demo call below!</span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Phone Call Marketing Section */}
+          {/* Step 2: Phone Call Section */}
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">📞 Market Your Product</h2>
-              <p className="text-gray-300 text-sm">Start outbound calls to promote your product</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl">📞</span>
+                <h2 className="text-2xl font-bold text-white">Step 2: Make Phone Call</h2>
+              </div>
+              <p className="text-gray-300 text-sm">Call a real phone number with your AI assistant</p>
             </div>
 
             <div className="space-y-4">
               <input
                 type="tel"
-                placeholder="Phone number (e.g., +1234567890 or 10-digit)"
+                placeholder="Phone number (e.g., +1234567890)"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50"
                 disabled={phoneLoading}
               />
 
@@ -262,7 +335,7 @@ export default function Control() {
                     <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Dialing...
                   </>
                 ) : (
-                  '📱 Start Call'
+                  '📱 Start Phone Call'
                 )}
               </button>
 
@@ -274,11 +347,14 @@ export default function Control() {
             </div>
           </div>
 
-          {/* Vapi Voice Assistant Demo Section */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl lg:col-span-2 xl:col-span-1">
+          {/* Step 3: Demo Call Section */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">🎤 Try Voice Assistant</h2>
-              <p className="text-gray-300 text-sm">Live demo of your Vapi voice assistant</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl">🎙️</span>
+                <h2 className="text-2xl font-bold text-white">Step 3: Try Demo Call</h2>
+              </div>
+              <p className="text-gray-300 text-sm">Test your AI assistant in your browser</p>
             </div>
 
             <div className="space-y-4">
@@ -294,16 +370,15 @@ export default function Control() {
               <div className="flex gap-3">
                 <button
                   onClick={handleStartVapiCall}
-                  className={`flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${!vapiReady || callActive ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
                   disabled={!vapiReady || callActive}
-                  title={callActive ? 'Call already active' : 'Start a demo call'}
                 >
                   {!vapiReady ? (
                     <>
-                      <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Loading SDK...
+                      <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Loading...
                     </>
                   ) : (
-                    '🎙️ Start Demo Call'
+                    '🎙️ Start Demo'
                   )}
                 </button>
 
@@ -311,29 +386,28 @@ export default function Control() {
                   <button
                     onClick={handleEndCall}
                     className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold rounded-lg transition-all duration-300"
-                    title="End the current call"
                   >
-                    🔴 End Call
+                    🔴 End
                   </button>
                 )}
               </div>
 
               {/* Info Messages */}
               {!vapiReady && (
-                <div className="p-4 rounded-lg bg-blue-500/20 text-blue-200 border border-blue-500/50">
+                <div className="p-4 rounded-lg bg-blue-500/20 text-blue-200 border border-blue-500/50 text-sm">
                   ⏳ Loading Vapi SDK...
                 </div>
               )}
 
               {vapiReady && !callActive && (
-                <div className="p-4 rounded-lg bg-green-500/20 text-green-200 border border-green-500/50">
-                  ✅ Ready! Click "Start Demo Call" and allow microphone access
+                <div className="p-4 rounded-lg bg-green-500/20 text-green-200 border border-green-500/50 text-sm">
+                  ✅ Ready! Click "Start Demo" and allow microphone access
                 </div>
               )}
 
               {callActive && (
-                <div className="p-4 rounded-lg bg-blue-500/20 text-blue-200 border border-blue-500/50">
-                  🎙️ Listening... Speak clearly into your microphone
+                <div className="p-4 rounded-lg bg-blue-500/20 text-blue-200 border border-blue-500/50 text-sm">
+                  🎙️ Listening... Speak clearly
                 </div>
               )}
 
@@ -341,17 +415,16 @@ export default function Control() {
               {transcript && (
                 <div className="bg-black/30 rounded-lg overflow-hidden border border-white/10">
                   <div className="flex justify-between items-center p-3 border-b border-white/10 bg-white/5">
-                    <h4 className="text-white font-semibold">📝 Live Transcript</h4>
+                    <h4 className="text-white font-semibold text-sm">📝 Live Transcript</h4>
                     <button
                       onClick={handleClearTranscript}
-                      className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded transition-colors text-sm"
-                      title="Clear transcript"
+                      className="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded transition-colors text-xs"
                     >
-                      ✕ Clear
+                      ✕
                     </button>
                   </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    <div className="p-4 space-y-2">
+                  <div className="max-h-60 overflow-y-auto">
+                    <div className="p-3 space-y-2">
                       {transcript.split('\n').map((line, idx) => {
                         if (!line.trim()) return null
                         const isUser = line.includes('👤 You')
@@ -359,7 +432,7 @@ export default function Control() {
                         return (
                           <div 
                             key={idx} 
-                            className={`p-2 rounded ${isUser ? 'bg-blue-500/20 text-blue-200' : isAssistant ? 'bg-purple-500/20 text-purple-200' : 'bg-gray-500/20 text-gray-300'}`}
+                            className={`p-2 rounded text-xs ${isUser ? 'bg-blue-500/20 text-blue-200' : isAssistant ? 'bg-purple-500/20 text-purple-200' : 'bg-gray-500/20 text-gray-300'}`}
                           >
                             {line}
                           </div>
