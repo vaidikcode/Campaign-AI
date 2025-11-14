@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Control from './pages/control'
 import Report from './pages/report'
 import WebEditor from './pages/webEditor'
+import PromptPage from './pages/PromptPage'
 const root = createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
@@ -14,6 +15,7 @@ root.render(
           <Routes>
             <Route path="/" element={<Home/>} />
             <Route path="/home" element={<Home/>} />
+            <Route path="/prompt" element={<PromptPage/>} />
             <Route path="/workflow" element={<Report/>} />
             <Route path="/web-editor" element={<WebEditor/>} />
             <Route path="/control" element={<Control/>} />
