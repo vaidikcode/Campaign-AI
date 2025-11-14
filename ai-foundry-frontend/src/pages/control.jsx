@@ -43,7 +43,7 @@ export default function Control() {
   // Handle Generate Pitch
   const handleGeneratePitch = async () => {
     if (!productName || !productUrl) {
-      setPitchError('⚠️ Please enter both product name and URL')
+      setPitchError('Please enter both product name and URL')
       return
     }
 
@@ -67,10 +67,10 @@ export default function Control() {
         setPitchError('')
       } else {
         const error = await response.json()
-        setPitchError(`❌ Failed: ${error.detail || 'Unknown error'}`)
+        setPitchError(`Failed: ${error.detail || 'Unknown error'}`)
       }
     } catch (error) {
-      setPitchError(`❌ Error: ${error.message}`)
+      setPitchError(`Error: ${error.message}`)
     }
 
     setPitchLoading(false)
@@ -89,7 +89,7 @@ export default function Control() {
     let normalizedNumber = phoneNumber.replace(/\s/g, '').replace(/[-()]/g, '')
     
     if (!normalizedNumber) {
-      setPhoneMessage('❌ Please enter a phone number')
+      setPhoneMessage('Please enter a phone number')
       return
     }
 
@@ -99,7 +99,7 @@ export default function Control() {
     }
 
     setPhoneLoading(true)
-    setPhoneMessage('⏳ Starting phone call to marketing assistant...')
+    setPhoneMessage('Starting phone call to marketing assistant...')
 
     try {
       const response = await fetch('http://localhost:8002/start-call', {
@@ -110,14 +110,14 @@ export default function Control() {
 
       if (response.ok) {
         const data = await response.json()
-        setPhoneMessage(`✅ Call initiated! Call ID: ${data.id || 'Processing...'}`)
+        setPhoneMessage(`Call initiated! Call ID: ${data.id || 'Processing...'}`)
         setPhoneNumber('')
       } else {
         const error = await response.json()
-        setPhoneMessage(`❌ Failed: ${error.detail || 'Unknown error'}`)
+        setPhoneMessage(`Failed: ${error.detail || 'Unknown error'}`)
       }
     } catch (error) {
-      setPhoneMessage(`❌ Error: ${error.message}`)
+      setPhoneMessage(`Error: ${error.message}`)
     }
 
     setPhoneLoading(false)
@@ -136,7 +136,7 @@ export default function Control() {
       const assistantId = import.meta.env.VITE_VAPI_ASSISTANT_ID
 
       if (!apiKey || !assistantId) {
-        alert('⚠️ Vapi credentials not found. Please set VITE_VAPI_API_KEY and VITE_VAPI_ASSISTANT_ID in .env')
+        alert('Vapi credentials not found. Please set VITE_VAPI_API_KEY and VITE_VAPI_ASSISTANT_ID in .env')
         return
       }
 
@@ -158,19 +158,19 @@ export default function Control() {
           vapiRef.current.on('call-start', () => {
             console.log('Vapi call started')
             setCallActive(true)
-            setTranscript('🎤 Call started...\n')
+            setTranscript('Call started...\n')
           })
 
           vapiRef.current.on('call-end', () => {
             console.log('Vapi call ended')
             setCallActive(false)
-            setTranscript(prev => prev + '\n✅ Call ended')
+            setTranscript(prev => prev + '\nCall ended')
           })
 
           vapiRef.current.on('message', (message) => {
             console.log('Vapi message:', message)
             if (message.type === 'transcript') {
-              setTranscript(prev => prev + `\n${message.role === 'user' ? '👤 You' : '🤖 Assistant'}: ${message.transcript}`)
+              setTranscript(prev => prev + `\n${message.role === 'user' ? 'You' : 'Assistant'}: ${message.transcript}`)
             }
             if (message.type === 'function-call') {
               console.log('Function called:', message.functionCall)
@@ -179,7 +179,7 @@ export default function Control() {
 
           vapiRef.current.on('error', (error) => {
             console.error('Vapi error:', error)
-            setTranscript(prev => prev + `\n❌ Error: ${error}`)
+            setTranscript(prev => prev + `\nError: ${error}`)
           })
         }
       } else {
@@ -207,7 +207,7 @@ export default function Control() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-5xl font-bold text-white mb-4 text-center">🎛️ AI Voice Agent Control</h1>
+        <h1 className="text-5xl font-bold text-white mb-4 text-center">AI Voice Agent Control</h1>
         <p className="text-xl text-gray-300 mb-12 text-center">Generate Custom Pitches & Test Your Voice Assistant</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -215,7 +215,6 @@ export default function Control() {
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl lg:col-span-2">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-3xl">✨</span>
                 <h2 className="text-3xl font-bold text-white">Step 1: Generate Your Custom Pitch</h2>
               </div>
               <p className="text-gray-300 text-sm">Enter your product details to generate a custom AI assistant pitch</p>
@@ -250,7 +249,7 @@ export default function Control() {
                   <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Generating Pitch...
                 </>
               ) : (
-                '� Generate System Prompt'
+                'Generate System Prompt'
               )}
             </button>
 
@@ -264,12 +263,12 @@ export default function Control() {
               <div className="space-y-4">
                 <div className="bg-black/30 rounded-lg border border-white/10 overflow-hidden">
                   <div className="flex justify-between items-center p-3 bg-white/5 border-b border-white/10">
-                    <h4 className="text-white font-semibold">📋 Generated System Prompt</h4>
+                    <h4 className="text-white font-semibold">Generated System Prompt</h4>
                     <button
                       onClick={handleCopyPrompt}
                       className="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded transition-colors text-sm flex items-center gap-2"
                     >
-                      {copied ? '✓ Copied!' : '📋 Copy'}
+                      {copied ? 'Copied!' : 'Copy'}
                     </button>
                   </div>
                   <div className="p-4 max-h-96 overflow-y-auto">
@@ -280,7 +279,7 @@ export default function Control() {
                 {/* Setup Instructions */}
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-6">
                   <h4 className="text-yellow-200 font-bold text-lg mb-4 flex items-center gap-2">
-                    <span>📖</span> Setup Instructions for Vapi Dashboard
+                    Setup Instructions for Vapi Dashboard
                   </h4>
                   <ol className="space-y-3 text-yellow-100">
                     <li className="flex gap-3">
@@ -309,7 +308,6 @@ export default function Control() {
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-3xl">📞</span>
                 <h2 className="text-2xl font-bold text-white">Step 2: Make Phone Call</h2>
               </div>
               <p className="text-gray-300 text-sm">Call a real phone number with your AI assistant</p>
@@ -335,12 +333,12 @@ export default function Control() {
                     <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Dialing...
                   </>
                 ) : (
-                  '📱 Start Phone Call'
+                  'Start Phone Call'
                 )}
               </button>
 
               {phoneMessage && (
-                <div className={`p-4 rounded-lg ${phoneMessage.includes('✅') ? 'bg-green-500/20 text-green-200 border border-green-500/50' : phoneMessage.includes('⏳') ? 'bg-blue-500/20 text-blue-200 border border-blue-500/50' : 'bg-red-500/20 text-red-200 border border-red-500/50'}`}>
+                <div className={`p-4 rounded-lg ${phoneMessage.includes('Call initiated') ? 'bg-green-500/20 text-green-200 border border-green-500/50' : phoneMessage.includes('Starting') ? 'bg-blue-500/20 text-blue-200 border border-blue-500/50' : 'bg-red-500/20 text-red-200 border border-red-500/50'}`}>
                   {phoneMessage}
                 </div>
               )}
@@ -351,7 +349,6 @@ export default function Control() {
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 hover:shadow-2xl">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-3xl">🎙️</span>
                 <h2 className="text-2xl font-bold text-white">Step 3: Try Demo Call</h2>
               </div>
               <p className="text-gray-300 text-sm">Test your AI assistant in your browser</p>
@@ -368,26 +365,26 @@ export default function Control() {
 
               {/* Demo Button Controls */}
               <div className="flex gap-3">
-                <button
-                  onClick={handleStartVapiCall}
-                  className={`flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
-                  disabled={!vapiReady || callActive}
-                >
-                  {!vapiReady ? (
-                    <>
-                      <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Loading...
-                    </>
-                  ) : (
-                    '🎙️ Start Demo'
-                  )}
-                </button>
-
-                {callActive && (
+                {!callActive ? (
+                  <button
+                    onClick={handleStartVapiCall}
+                    className={`w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+                    disabled={!vapiReady}
+                  >
+                    {!vapiReady ? (
+                      <>
+                        <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Loading...
+                      </>
+                    ) : (
+                      'Start Demo'
+                    )}
+                  </button>
+                ) : (
                   <button
                     onClick={handleEndCall}
-                    className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold rounded-lg transition-all duration-300"
+                    className="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold rounded-lg transition-all duration-300"
                   >
-                    🔴 End
+                    End Call
                   </button>
                 )}
               </div>
@@ -395,19 +392,19 @@ export default function Control() {
               {/* Info Messages */}
               {!vapiReady && (
                 <div className="p-4 rounded-lg bg-blue-500/20 text-blue-200 border border-blue-500/50 text-sm">
-                  ⏳ Loading Vapi SDK...
+                  Loading Vapi SDK...
                 </div>
               )}
 
               {vapiReady && !callActive && (
                 <div className="p-4 rounded-lg bg-green-500/20 text-green-200 border border-green-500/50 text-sm">
-                  ✅ Ready! Click "Start Demo" and allow microphone access
+                  Ready! Click "Start Demo" and allow microphone access
                 </div>
               )}
 
               {callActive && (
                 <div className="p-4 rounded-lg bg-blue-500/20 text-blue-200 border border-blue-500/50 text-sm">
-                  🎙️ Listening... Speak clearly
+                  Listening... Speak clearly
                 </div>
               )}
 
@@ -415,20 +412,20 @@ export default function Control() {
               {transcript && (
                 <div className="bg-black/30 rounded-lg overflow-hidden border border-white/10">
                   <div className="flex justify-between items-center p-3 border-b border-white/10 bg-white/5">
-                    <h4 className="text-white font-semibold text-sm">📝 Live Transcript</h4>
+                    <h4 className="text-white font-semibold text-sm">Live Transcript</h4>
                     <button
                       onClick={handleClearTranscript}
                       className="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded transition-colors text-xs"
                     >
-                      ✕
+                      Clear
                     </button>
                   </div>
                   <div className="max-h-60 overflow-y-auto">
                     <div className="p-3 space-y-2">
                       {transcript.split('\n').map((line, idx) => {
                         if (!line.trim()) return null
-                        const isUser = line.includes('👤 You')
-                        const isAssistant = line.includes('🤖 Assistant')
+                        const isUser = line.includes('You:')
+                        const isAssistant = line.includes('Assistant:')
                         return (
                           <div 
                             key={idx} 
