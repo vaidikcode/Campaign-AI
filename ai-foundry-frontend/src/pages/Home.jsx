@@ -13,7 +13,6 @@ import Lenis from 'lenis'
 gsap.registerPlugin(ScrollTrigger)
 
 function LandingPage() {
-  const [scrollLocked, setScrollLocked] = useState(false)
   const lenisRef = useRef(null)
   useEffect(() => {
     // force light mode
@@ -43,27 +42,6 @@ function LandingPage() {
 
     gsap.ticker.lagSmoothing(0)
 
-    // ----- SNAP BETWEEN SECTIONS -----
-    const sections = gsap.utils.toArray('[data-scroll-section]')
-
-    if (sections.length > 0) {
-      ScrollTrigger.create({
-        trigger: document.body,
-        start: 'top top',
-        end: 'bottom bottom',
-        // snap based on overall scroll progress
-        snap: {
-          snapTo: (value) => {
-            const n = sections.length - 1
-            if (n <= 0) return 0
-            return Math.round(value * n) / n
-          },
-          duration: 0.7,
-          ease: 'power1.inOut',
-        },
-      })
-    }
-
     ScrollTrigger.refresh()
 
     return () => {
@@ -74,56 +52,7 @@ function LandingPage() {
     }
   }, [])
 
-  // Control Lenis scrolling based on lock state
-  useEffect(() => {
-    if (lenisRef.current) {
-      if (scrollLocked) {
-        lenisRef.current.stop()
-      } else {
-        lenisRef.current.start()
-      }
-    }
-  }, [scrollLocked])
-
-  // Prevent native scrollbar and touch scroll while locked (ensures Lenis stop is effective)
-  useEffect(() => {
-    const setHidden = () => {
-      try {
-        document.documentElement.style.overflow = 'hidden'
-        document.body.style.overflow = 'hidden'
-        // On touch devices also prevent touch-action to avoid momentum scrolling
-        document.documentElement.style.touchAction = 'none'
-      } catch (e) {
-        // ignore in non-browser environments
-      }
-    }
-
-    const clearHidden = () => {
-      try {
-        document.documentElement.style.overflow = ''
-        document.body.style.overflow = ''
-        document.documentElement.style.touchAction = ''
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    if (scrollLocked) {
-      setHidden()
-    } else {
-      clearHidden()
-    }
-
-    return () => {
-      clearHidden()
-    }
-  }, [scrollLocked])
-
   const scrollToWorkflow = () => {
-    // Unlock scrolling first
-    setScrollLocked(false)
-    
-    // Then scroll to workflow section
     setTimeout(() => {
       const target = document.querySelector('#workflow-section')
       if (!target) return
@@ -164,8 +93,7 @@ function LandingPage() {
           >
             <div className="w-full">
               <Features 
-                onAllClicked={scrollToWorkflow} 
-                onScrollLockChange={setScrollLocked}
+                onAllClicked={scrollToWorkflow}
               />
             </div>
           </section>

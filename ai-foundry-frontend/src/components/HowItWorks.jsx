@@ -31,7 +31,7 @@ const HowItWorks = () => {
   ]
 
   return (
-    <section id="learn" className="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+    <section id="learn" className="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="container mx-auto max-w-7xl w-full">
 
         {/* First Way - If you have idea for your startup */}
@@ -49,29 +49,43 @@ const HowItWorks = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-100px' }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass rounded-2xl p-6 md:p-8 hover:shadow-xl transition-all duration-300 relative group"
+                  className="glass rounded-2xl p-6 md:p-8 transition-all duration-300 relative group overflow-hidden"
+                  style={{
+                    aspectRatio: '1/1',
+                    background:
+                      'linear-gradient(to bottom right, #C084FC, #A855F7 20%, #7C3AED 65%, #6B21A8)',
+                  }}
                 >
                   {/* Step Number */}
-                  <div className="absolute top-4 right-4 text-4xl font-bold text-gray-200 dark:text-gray-700 group-hover:text-blue-400 dark:group-hover:text-blue-600 transition-colors duration-200">
+                  <div className="absolute top-4 right-4 text-4xl font-bold text-white/20 group-hover:text-white/40 transition-colors duration-200">
                     {step.number}
                   </div>
 
-                  {/* Icon */}
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-lg"
-                  >
-                    <step.icon className="w-8 h-8 text-white" />
-                  </motion.div>
+                  <div className="flex flex-col h-full justify-center items-center text-center gap-4">
+                    {/* Icon */}
+                    <div className="relative">
+                      {/* Dark silhouette background */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <step.icon className="w-16 h-16 md:w-20 md:h-20 text-black/10" />
+                      </div>
+                      {/* Animated icon on top */}
+                      <motion.div
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ duration: 0.3 }}
+                        className="icon-animate relative"
+                      >
+                        <step.icon className="w-16 h-16 md:w-20 md:h-20 text-white" />
+                      </motion.div>
+                    </div>
 
-                  {/* Content */}
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    {step.description}
-                  </p>
+                    {/* Content */}
+                    <h3 className="text-xl md:text-2xl font-bold text-white heading-gradient press-start-2p-regular">
+                      {step.title}
+                    </h3>
+                    <p className="text-white/90 leading-relaxed px-2">
+                      {step.description}
+                    </p>
+                  </div>
                 </motion.div>
               ))}
               </div>
