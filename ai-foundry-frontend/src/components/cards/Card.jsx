@@ -25,15 +25,27 @@ function Card({ id, title, description, accentColor = 'accent', brdUrl, strategy
 
   const handleClick = () => {
     if (!isReady) return
-    if (id === 1) {
-      navigate('/breakdown', { state: { brdUrl, strategyMarkdown } })
-    } else if (id === 2) {
-      const state = landingPageCode ? { html: landingPageCode } : undefined
-      navigate('/web-editor', { state })
-    } else if (id === 3) {
-      navigate('/postmaker', { state: { contentData, generatedAssets } })
-    } else if (id === 4) {
-      navigate('/control')
+    try {
+      if (id === 1) {
+        if (brdUrl || strategyMarkdown) {
+          localStorage.setItem('campaign_breakdown', JSON.stringify({ brdUrl, strategyMarkdown }))
+        }
+        window.open('/breakdown', '_blank')
+      } else if (id === 2) {
+        if (landingPageCode) {
+          localStorage.setItem('campaign_landingPageCode', landingPageCode)
+        }
+        window.open('/web-editor', '_blank')
+      } else if (id === 3) {
+        if (contentData || generatedAssets) {
+          localStorage.setItem('campaign_content', JSON.stringify({ contentData, generatedAssets }))
+        }
+        window.open('/postmaker', '_blank')
+      } else if (id === 4) {
+        window.open('/control', '_blank')
+      }
+    } catch (e) {
+      console.error('Failed opening new tab:', e)
     }
   }
 

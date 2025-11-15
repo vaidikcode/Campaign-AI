@@ -1,10 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import BackButton from '../components/BackButton'
 
 export default function Research() {
 	const loc = useLocation()
-	const researchData = loc.state?.researchData || null
+	const [researchData, setResearchData] = useState(loc.state?.researchData || null)
+
+	useEffect(() => {
+		if (!researchData) {
+			try {
+				const stored = localStorage.getItem('campaign_research')
+				if (stored) {
+					const parsed = JSON.parse(stored)
+					if (parsed?.researchData) setResearchData(parsed.researchData)
+				}
+			} catch (e) {
+				console.error('Failed loading research from storage', e)
+			}
+		}
+	}, [researchData])
 
 	return (
 		<div className="w-full min-h-screen p-6" style={{background:'#FFFFFF'}}>

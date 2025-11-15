@@ -4,7 +4,22 @@ import BackButton from '../components/BackButton'
 
 function Postmaker() {
   const location = useLocation()
-  const { contentData, generatedAssets } = location.state || {}
+  const { contentData: stateContentData, generatedAssets: stateGeneratedAssets } = location.state || {}
+  let contentData = stateContentData
+  let generatedAssets = stateGeneratedAssets
+
+  if (!contentData || !generatedAssets) {
+    try {
+      const stored = localStorage.getItem('campaign_content')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (!contentData && parsed.contentData) contentData = parsed.contentData
+        if (!generatedAssets && parsed.generatedAssets) generatedAssets = parsed.generatedAssets
+      }
+    } catch (e) {
+      console.error('Failed to load content from storage', e)
+    }
+  }
 
   const handleInstagramPost = () => {
     alert('Instagram post would be generated/scheduled (simulated).')

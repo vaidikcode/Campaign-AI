@@ -8,8 +8,15 @@ export default function WebEditor(){
   const [html, setHtml] = useState('<!-- Paste landing page HTML here -->')
 
   useEffect(() => {
-    if (loc && loc.state && loc.state.html) {
+    if (loc?.state?.html) {
       setHtml(loc.state.html)
+      return
+    }
+    try {
+      const stored = localStorage.getItem('campaign_landingPageCode')
+      if (stored) setHtml(stored)
+    } catch (e) {
+      console.error('Failed loading landingPageCode from storage', e)
     }
   }, [loc])
 

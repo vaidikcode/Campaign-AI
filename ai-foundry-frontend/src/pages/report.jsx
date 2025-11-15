@@ -466,7 +466,12 @@ export default function Report(){
 
   function goToResearch() {
     if (!researchData) return
-    navigate('/research', { state: { researchData } })
+    try {
+      localStorage.setItem('campaign_research', JSON.stringify({ researchData }))
+      window.open('/research', '_blank')
+    } catch (e) {
+      console.error('Failed opening research in new tab', e)
+    }
   }
 
   return (

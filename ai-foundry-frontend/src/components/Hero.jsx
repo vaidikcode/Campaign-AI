@@ -261,7 +261,7 @@ function Hero() {
             }}
             className="text-[10rem] md:text-[10rem] lg:text-[12rem] font-bold tracking-wide absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 bg-gradient-to-b from-[#FF9999] to-[#AA6677] bg-clip-text text-transparent"
           >
-            NAAMBATADO
+            CAMAPAIGNAI
           </h1>
 
           {/* Foreground text */}

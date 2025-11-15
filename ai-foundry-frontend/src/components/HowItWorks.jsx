@@ -292,12 +292,9 @@ const HowItWorks = () => {
             href="/prompt"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-block relative px-12 py-5 text-lg font-bold rounded-full overflow-hidden group"
-            style={{
-              color: '#667eea',
-            }}
+            className="inline-block relative px-12 py-5 text-lg font-bold rounded-full overflow-hidden group text-white"
           >
-            <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 group-hover:text-white" style={{ color: 'inherit' }}>
+            <span className="relative z-10 flex items-center gap-2 transition-colors duration-300 text-white">
               Get Started
               <motion.span
                 animate={{ x: [0, 5, 0] }}
